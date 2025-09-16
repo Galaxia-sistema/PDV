@@ -1,13 +1,14 @@
-import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ViewChild, Output, EventEmitter } from '@angular/core';
 import { provideCharts, withDefaultRegisterables, BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartType } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-bar-chart',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective],
+  imports: [CommonModule, BaseChartDirective, FormsModule],
   providers: [
     provideCharts(withDefaultRegisterables([ChartDataLabels]))
   ],
@@ -15,38 +16,45 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./bar-chart.css']
 })
 export class BarChartComponent implements OnChanges {
-  @Input() value: boolean = true;
+  // configuración desde el padre
+  @Input() value: boolean = true; // fallback: true => 3 series
   @Input() orientation: 'x' | 'y' = 'x';
   @Input() title: string = '';
-  @Input() data: number[] = []; // única serie (opcional)
-  @Input() labels: string[] = [];
-  @Input() datasets?: ChartConfiguration['data']['datasets']; // pasar varias series si se desea
+  @Input() data: number[] = []; // single serie opcional
+  @Input() labels: string[] = []; // etiquetas
+  @Input() datasets?: ChartConfiguration['data']['datasets']; // si se pasan series reales
   @Input() height: string = '400px';
-  @Input() filter: string = ''; // texto para filtrar etiquetas (live)
+  @Input() placa: boolean = false; // control para mostrar input
+  @Input() filter: string = '';    // valor sincronizado desde el padre (opcional)
+
+  // emisor para notificar al padre cuando el usuario escribe en el input del hijo
+  @Output() filterChange = new EventEmitter<string>();
 
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
+
+  // input local (ngModel) que muestra el texto en la caja dentro del hijo
+  searchText: string = '';
 
   barChartType: ChartType = 'bar';
   barChartLegend = true;
 
   barChartOptions: ChartConfiguration['options'] = {
     responsive: true,
-    maintainAspectRatio: false, // importante
-
+    maintainAspectRatio: false,
     indexAxis: 'x',
     plugins: {
       legend: { display: true, position: 'top' },
       datalabels: { anchor: 'end', align: 'end', color: '#000', font: { weight: 'bold', size: 12 } }
     },
     scales: {
-      x: { ticks: { autoSkip: false, maxRotation: 90, minRotation: 45 } },
+      x: { ticks: { autoSkip: false, maxRotation: 90, minRotation: 0 } },
       y: { ticks: { autoSkip: false } }
     }
   };
 
   barChartData: ChartConfiguration['data'] = { labels: [], datasets: [] };
 
-  // datos por defecto (fallback)
+  // fallback data
   private defaultLabels = ['Soldado 1', 'Soldado 2', 'Soldado 3', 'Soldado 4', 'Soldado 5'];
   private defaultDatasets3: ChartConfiguration['data']['datasets'] = [
     { data: [65, 59, 80, 81, 56], label: 'Empalmes' },
@@ -58,6 +66,20 @@ export class BarChartComponent implements OnChanges {
   ];
 
   ngOnChanges(changes: SimpleChanges): void {
+    // si el padre actualiza filter, sincronizamos el input local
+    if (changes['filter'] && changes['filter'].currentValue !== undefined) {
+      this.searchText = changes['filter'].currentValue ?? '';
+    }
+    // recomponer gráfico
+    this.updateChartData();
+  }
+
+  // cuando el usuario escribe en el input del hijo...
+  onSearchChange(): void {
+    // actualizamos el filter local y notificamos al padre
+    this.filter = this.searchText;
+    this.filterChange.emit(this.searchText);
+    // actualizamos inmediatamente para dar feedback instantáneo
     this.updateChartData();
   }
 
@@ -65,40 +87,41 @@ export class BarChartComponent implements OnChanges {
     // aplicar orientación
     this.barChartOptions = { ...this.barChartOptions, indexAxis: this.orientation };
 
-    // labels base
+    // labels base (si no vienen, usar fallback)
     const baseLabels = (this.labels && this.labels.length) ? this.labels : this.defaultLabels;
 
-    // indices que coinciden con el filter (si hay)
+    // calcular índices que coinciden con el filtro actual (filter)
+    const search = (this.filter ?? '').toString().trim().toLowerCase();
     let indices: number[] = [];
-    if (this.filter && this.filter.trim()) {
-      const s = this.filter.trim().toLowerCase();
+    if (search) {
       indices = baseLabels
         .map((lab, i) => ({ lab: String(lab || ''), i }))
-        .filter(x => x.lab.toLowerCase().includes(s))
+        .filter(x => x.lab.toLowerCase().includes(search))
         .map(x => x.i);
     } else {
       indices = baseLabels.map((_, i) => i);
     }
 
-    // labels filtradas (puede quedar vacío si no hay coincidencias)
+    // crear labels filtradas
     const labelsFiltered = indices.map(i => baseLabels[i]);
 
-    // decidir datasets finales (prioridad: datasets prop > data (single) > fallback por value)
+    // construir datasets finales (prioridad):
+    // 1) datasets (si el padre pasa varias series reales)
+    // 2) data (si el padre pasa un array simple => single serie)
+    // 3) fallback según value (3 series o 1 serie)
     let finalDatasets: ChartConfiguration['data']['datasets'] = [];
 
     if (this.datasets && this.datasets.length) {
-      // filtrar cada dataset por los indices
       finalDatasets = this.datasets.map(ds => {
         const dsData = (ds.data as number[]) ?? [];
         const filtered = indices.map(i => dsData[i] ?? 0);
         return { ...ds, data: filtered };
       });
     } else if (this.data && this.data.length) {
-      // single serie (filtrada)
       const filtered = indices.map(i => this.data[i] ?? 0);
       finalDatasets = [{ data: filtered, label: this.title || 'Datos' }];
     } else {
-      // fallback por value
+      // fallback según value
       if (this.value) {
         finalDatasets = this.defaultDatasets3.map(ds => ({
           ...ds,
@@ -112,7 +135,7 @@ export class BarChartComponent implements OnChanges {
       }
     }
 
-    // asignar al chart
+    // asignar al chart (labels + datasets)
     this.barChartData = {
       labels: labelsFiltered,
       datasets: finalDatasets

@@ -1,10 +1,25 @@
-<div class="chart-container">
+<div class="chart-container" [style.height]="height">
   <h4 *ngIf="title">{{ title }}</h4>
+
+  <!-- input dentro del hijo -->
+  <ng-container *ngIf="placa">
+    <div class="filter">
+      <label for="placa">Buscar placa:</label>
+      <input
+        id="placa"
+        name="placa"
+        type="text"
+        placeholder="Escribe la placa..."
+        [(ngModel)]="searchText"
+        (ngModelChange)="onSearchChange()" />
+    </div>
+  </ng-container>
+
   <canvas
     baseChart
     [data]="barChartData"
     [options]="barChartOptions"
-    [legend]="barChartLegend"
-    [type]="barChartType">
+    [type]="barChartType"
+    [legend]="barChartLegend">
   </canvas>
 </div>

@@ -1,5 +1,45 @@
 .chart-container {
   position: relative;
   width: 600px;  
-  max-height: 300px; /* opcional */
+  max-height: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* Los hijos ocupan todo el ancho disponible */
+  gap: 10px; /* separa label/input del gráfico */
+}
+
+/* Contenedor para el filtro */
+.chart-container .filter {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* fuerza label e input a alinearse a la izquierda */
+  width: 100%;
+  max-width: 280px;
+}
+
+.chart-container label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+  color: #555;
+}
+
+.chart-container input[type="text"] {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.chart-container input[type="text"]:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+}
+
+/* Solo el canvas centrado */
+.chart-container canvas {
+  align-self: center;
 }

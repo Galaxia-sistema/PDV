@@ -6,25 +6,36 @@
 
 <!-- graphics.html -->
  <div class="section">
-    <label for="placa">Buscar placa:</label>
-    <input type="text" id="placa" name="placa" [(ngModel)]="placaBusqueda" placeholder="Escribe la placa..." />
+    
+    
     <div class="container">
 
-    <app-bar-chart
-        [orientation]="'y'"
-        [data]="datosPlacas"
-        [labels]="labelsPlacas"
-        [filter]="placaBusqueda"
-        title="Vehículos más escoltados">
-    </app-bar-chart>
+<app-bar-chart
+  [orientation]="'y'"
+  [data]="datosPlacas"
+  [labels]="labelsPlacas"
+  [filter]="placaBusqueda"
+  (filterChange)="placaBusqueda = $event"
+  title="Vehículos más escoltados"
+  [placa]="true">
+</app-bar-chart>
+
 
     <app-bar-chart [value]="false" title="Recolección de Consignaciones"></app-bar-chart>
-    <app-bar-chart [value]="false" title="Total consignación mensual"></app-bar-chart>    
+    <app-bar-chart 
+        [value]="false"
+        title="Total consignación mensual"
+        [orientation]="'y'">
+    </app-bar-chart>    
     </div>
 </div>
 <br>
-<div class="container">
-    <app-bar-chart [value]="true" title="Estadísticas de General" [labels]="labelGeneral"></app-bar-chart>
+<br>
+<br>
+
+<div class="container">    
+    <app-bar-chart [datasets]="multiSeries" [labels]="labelGeneral"  title="Estadísticas de General"></app-bar-chart>
+
     <app-pie-chart [data]="datosVentas" [labels]="labels" title="Ventas por Producto"></app-pie-chart>
     <app-pie-chart [data]="datosVentas" [labels]="labels" title="Ventas por Producto"></app-pie-chart>
     <app-pie-chart [data]="datosUsuarios" [labels]="labels" title="Usuarios por Región"></app-pie-chart>
