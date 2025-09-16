@@ -1,0 +1,7 @@
+.container {
+  display: flex;
+  flex-direction: row;   /* En fila */
+  justify-content: center; /* Centra en el eje horizontal */
+  align-items: center;   /* Centra en el eje vertical */
+  gap: 20px;
+}
