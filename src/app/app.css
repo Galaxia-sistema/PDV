@@ -1,7 +1,13 @@
-.container {
-  display: flex;
-  flex-direction: row;   /* En fila */
-  justify-content: center; /* Centra en el eje horizontal */
-  align-items: center;   /* Centra en el eje vertical */
-  gap: 20px;
+/* app-level wrapper */
+.app-root {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Contenedor central que determina el ancho máximo del sitio */
+.site-container {
+  width: 100%;  
+  margin: 0 auto;      /* centra horizontalmente */
+  padding: 10px 80px;       /* separaciones internas */
+  box-sizing: border-box;
 }

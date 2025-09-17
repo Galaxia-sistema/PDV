@@ -25,6 +25,7 @@ export class BarChartComponent implements OnChanges {
   @Input() datasets?: ChartConfiguration['data']['datasets']; // si se pasan series reales
   @Input() height: string = '400px';
   @Input() placa: boolean = false; // control para mostrar input
+  @Input() escolta: boolean = true; // control para mostrar input
   @Input() filter: string = '';    // valor sincronizado desde el padre (opcional)
 
   // emisor para notificar al padre cuando el usuario escribe en el input del hijo
@@ -43,11 +44,30 @@ export class BarChartComponent implements OnChanges {
     maintainAspectRatio: false,
     indexAxis: 'x',
     plugins: {
-      legend: { display: true, position: 'top' },
-      datalabels: { anchor: 'end', align: 'end', color: '#000', font: { weight: 'bold', size: 12 } }
+      legend: { 
+        display: true,
+        position: 'top'
+      },
+      datalabels: {
+        offset: 4,
+        anchor: 'end',
+        align: 'end',
+        color: '#000',
+        font: { 
+          weight: 'bold',
+          size: 12
+        }
+      }
     },
     scales: {
-      x: { ticks: { autoSkip: false, maxRotation: 90, minRotation: 0 } },
+      x: { 
+        ticks: {
+          autoSkip: false,
+          maxRotation: 90,
+          minRotation: 0,
+          
+        }
+      },
       y: { ticks: { autoSkip: false } }
     }
   };
@@ -105,10 +125,6 @@ export class BarChartComponent implements OnChanges {
     // crear labels filtradas
     const labelsFiltered = indices.map(i => baseLabels[i]);
 
-    // construir datasets finales (prioridad):
-    // 1) datasets (si el padre pasa varias series reales)
-    // 2) data (si el padre pasa un array simple => single serie)
-    // 3) fallback según value (3 series o 1 serie)
     let finalDatasets: ChartConfiguration['data']['datasets'] = [];
 
     if (this.datasets && this.datasets.length) {
@@ -134,14 +150,12 @@ export class BarChartComponent implements OnChanges {
         }));
       }
     }
-
-    // asignar al chart (labels + datasets)
+    
     this.barChartData = {
       labels: labelsFiltered,
       datasets: finalDatasets
     };
 
-    // forzar update si existe la referencia
     setTimeout(() => this.chart?.update(), 0);
   }
 }

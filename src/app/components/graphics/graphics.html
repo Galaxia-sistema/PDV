@@ -1,46 +1,71 @@
-<div class="container-date">
-  <label for="fecha">Fecha:</label>
-  <input type="text" placeholder="Escribe algo para buscar..." id="fecha" name="fecha">
+<div class="date-filters">
+  <label for="fechaInicio">Fecha Inicio:</label>
+  <input type="date" id="fechaInicio" name="fechaInicio">
+
+  <label for="fechaFin">Fecha Fin:</label>
+  <input type="date" id="fechaFin" name="fechaFin">
+
+  <button class="btn-filtrar">buscar</button>
 </div>
+
 <router-outlet></router-outlet>
 
 <!-- graphics.html -->
- <div class="section">
+<div class="section" style="align-items: center;">
+  <div class="charts-container">
+        <!-- Columna del primer gráfico + paginación -->
+        <div class="chart-column" style="height: 500px;position: relative;">
+            <app-bar-chart
+                [orientation]="'y'"
+                [data]="datosPlacasPaginados"
+                [labels]="labelsPlacasPaginadas"
+                title="Vehículos más escoltados"
+                [placa]="true"
+                [escolta]="false">
+            </app-bar-chart>
+
+            <div class="pagination" style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);">
+                <button (click)="prevPage()" [disabled]="currentPage === 0">Anterior</button>
+                <span>Página {{ currentPage + 1 }} de {{ totalPages }}</span>
+                <button (click)="nextPage()" [disabled]="currentPage >= totalPages - 1">Siguiente</button>
+            </div>
+        </div>
+
+        <!-- Segunda columna con el otro gráfico -->
+        <div class="chart-column">
+        <app-bar-chart
+            [value]="false"
+            title="Recolección de Consignaciones">
+        </app-bar-chart>
+        </div>
     
-    
-    <div class="container">
 
-<app-bar-chart
-  [orientation]="'y'"
-  [data]="datosPlacas"
-  [labels]="labelsPlacas"
-  [filter]="placaBusqueda"
-  (filterChange)="placaBusqueda = $event"
-  title="Vehículos más escoltados"
-  [placa]="true">
-</app-bar-chart>
-
-
-    <app-bar-chart [value]="false" title="Recolección de Consignaciones"></app-bar-chart>
-    <app-bar-chart 
-        [value]="false"
-        title="Total consignación mensual"
-        [orientation]="'y'">
-    </app-bar-chart>    
+    <div class="totalConsignacion"> 
+        <h3>Total Consignaciones</h3>
+        <p>$ 1,250,000.00</p>
     </div>
-</div>
-<br>
-<br>
-<br>
-
-<div class="container">    
-    <app-bar-chart [datasets]="multiSeries" [labels]="labelGeneral"  title="Estadísticas de General"></app-bar-chart>
-
-    <app-pie-chart [data]="datosVentas" [labels]="labels" title="Ventas por Producto"></app-pie-chart>
-    <app-pie-chart [data]="datosVentas" [labels]="labels" title="Ventas por Producto"></app-pie-chart>
-    <app-pie-chart [data]="datosUsuarios" [labels]="labels" title="Usuarios por Región"></app-pie-chart>
+  </div>
 </div>
 
-<div class="container">
 
+<div class="section-bar" >
+    <app-bar-chart 
+        [datasets]="multiSeries"
+        [labels]="labelGeneral"
+        title="Estadísticas de General"
+        [escolta]="false">
+    </app-bar-chart>
+    <app-bar-chart      
+        [labels]="labelGeneral"
+        title="Cantidad de acompañamientos por escolta"
+        [escolta]="false"
+        [value]="false">                   
+    </app-bar-chart>
+</div>
+
+
+<div class="pie-grid">
+    <app-pie-chart [data]="datosVentas" [labels]="labels" title="Cantidad de visitas a puntos de venta"></app-pie-chart>
+    <app-pie-chart [data]="datosVentas" [labels]="labels" title="Cantidad de empalmes"></app-pie-chart>
+    <app-pie-chart [data]="datosUsuarios" [labels]="labels" title="Cantidad de acompañamientos"></app-pie-chart>
 </div>
