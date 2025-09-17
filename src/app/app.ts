@@ -11,5 +11,5 @@ import { Header } from './components/header/header';
   styleUrls: ['./app.css']
 })
 export class App {
-  protected readonly title = signal('mac-indicadores');
+  protected readonly title = signal('mac-indicadores');    
 }

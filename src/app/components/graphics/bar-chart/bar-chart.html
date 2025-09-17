@@ -12,8 +12,22 @@
         placeholder="Escribe la placa..."
         [(ngModel)]="searchText"
         (ngModelChange)="onSearchChange()" />
-    </div>
+      </div>
   </ng-container>
+
+  <ng-container *ngIf="escolta">
+    <div class="filter">
+      <label for="escolta">Buscar escolta:</label>
+      <input
+        id="escolta"
+        name="escolta"
+        type="text"
+        placeholder="Escribe la escolta..."
+        [(ngModel)]="searchText"
+        (ngModelChange)="onSearchChange()" />
+      </div>
+  </ng-container>
+
 
   <canvas
     baseChart
