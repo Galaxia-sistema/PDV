@@ -34,7 +34,10 @@
         <!-- Segunda columna con el otro gráfico -->
         <div class="chart-column">
         <app-bar-chart
+            [data]="datosConsignacion"
+            [labels]="labelsConsignacion"
             [value]="false"
+            [formartterDiner]="true"
             title="Recolección de Consignaciones">
         </app-bar-chart>
         </div>

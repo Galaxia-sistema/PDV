@@ -41,6 +41,13 @@ export class Graphics implements OnInit {
 
     console.log('Placas únicas:', this.labelsPlacas);
     console.log('Cantidad por placa:', this.datosPlacas);
+
+    this.labelsConsignacion = (await this.service.leerSumaColumna1PorEscolta()).labels;
+    this.datosConsignacion = (await this.service.leerSumaColumna1PorEscolta()).data;
+     
+ 
+    console.log((await this.service.leerSumaColumna1PorEscolta()).data); //TENGO ALGO MALO EN LA LOGICA, REVISAR
+    console.log((await this.service.leerSumaColumna1PorEscolta()).labels); //TENGO ALGO MALO EN LA LOGICA, REVISAR
   }
 
   actualizarPagina() {
@@ -109,4 +116,9 @@ export class Graphics implements OnInit {
     { lat: 6.244, lng: -75.581, label: 'Medellín' },
     { lat: 3.451, lng: -76.532, label: 'Cali' }
   ];
+
+
+
+
+
 }
