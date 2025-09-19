@@ -34,16 +34,27 @@
         <!-- Segunda columna con el otro gráfico -->
         <div class="chart-column">
         <app-bar-chart
+            [data]="datosConsignacion"
+            [labels]="labelsEscolta"
             [value]="false"
+
+            [formartterDiner]="true"
             title="Recolección de Consignaciones">
         </app-bar-chart>
         </div>
     
-
+        <!-- SERIA BUENO QUE TODO CAMBIARA AL SELECIONAR EL MES-->
     <div class="totalConsignacion"> 
-        <h3>Total Consignaciones</h3>
-        <p>$ 1,250,000.00</p>
-    </div>
+        <h3>Total Consignacion </h3> 
+        <p>{{totalConsignacionValue}}</p>
+        <br>
+        <h3>Total acompañamientos</h3>
+        <p>245</p>
+        <h3>Total punto de venta</h3>
+        <p>245</p>
+        <h3>Total empalmes</h3>        
+        <p>245</p>
+    </div>    
   </div>
 </div>
 
@@ -51,12 +62,12 @@
 <div class="section-bar" >
     <app-bar-chart 
         [datasets]="multiSeries"
-        [labels]="labelGeneral"
+        [labels]="labelsEscolta"
         title="Estadísticas de General"
         [escolta]="false">
     </app-bar-chart>
     <app-bar-chart      
-        [labels]="labelGeneral"
+        [labels]="labelsEscolta"
         title="Cantidad de acompañamientos por escolta"
         [escolta]="false"
         [value]="false">                   
@@ -65,7 +76,7 @@
 
 
 <div class="pie-grid">
-    <app-pie-chart [data]="datosVentas" [labels]="labels" title="Cantidad de visitas a puntos de venta"></app-pie-chart>
-    <app-pie-chart [data]="datosVentas" [labels]="labels" title="Cantidad de empalmes"></app-pie-chart>
-    <app-pie-chart [data]="datosUsuarios" [labels]="labels" title="Cantidad de acompañamientos"></app-pie-chart>
+    <app-pie-chart [data]="datosVentas" [labels]="labelsEscolta" title="Cantidad de visitas a puntos de venta"></app-pie-chart>
+    <app-pie-chart [data]="datosVentas" [labels]="labelsEscolta" title="Cantidad de empalmes"></app-pie-chart>
+    <app-pie-chart [data]="datosUsuarios" [labels]="labelsEscolta" title="Cantidad de acompañamientos"></app-pie-chart>
 </div>

@@ -1,10 +1,11 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BarChartComponent } from './bar-chart/bar-chart';
 import { PieChartComponent } from './pie-chart/pie-chart';
 import { GraphicsService } from './service/graphics-service';
 import { BaseChartDirective } from 'ng2-charts';
+import { formatValue } from '../../helper/formatter-number'
 
 @Component({
   selector: 'app-graphics',
@@ -18,31 +19,65 @@ export class Graphics implements OnInit {
 
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
 
-  // Datos dinámicos desde Excel
+  labels = ['Placa1', 'Placa2', 'Placa3', 'Placa4'];    
+  placaSeleccionada: string = '';
+
+  multiSeries = [
+    { data: [1, 2, 3, 4, 5], label: 'Empalmes' },
+    { data: [6, 7, 8, 9, 10], label: 'Puntos de venta' },
+    { data: [11, 12, 13, 14, 15], label: 'Acompañamientos' }
+  ];
+
+  datosVentas = [30, 40, 30, 90, 64];
+  datosUsuarios = [50, 20, 30];  
+  datosConsignacion = [2500];
+  labelsEscolta = [''];
+
+  placaBusqueda: string = '';
+  //-----------------------------------------
   labelsPlacas: string[] = [];
   datosPlacas: number[] = [];
 
-  // Datos que se mostrarán en el gráfico (paginados)
   labelsPlacasPaginadas: string[] = [];
   datosPlacasPaginados: number[] = [];
 
-  // Configuración de paginación
   pageSize = 10;
   currentPage = 0;
+  @Input() fechaInicio: string = '';
+  @Input() fechaFin: string = '';
+
+  private onSearchDataForDate(): void {
+    const fechaInicio = this.fechaInicio ? new Date(this.fechaInicio) : null;
+    const fechaFin = this.fechaFin ? new Date(this.fechaFin) : null;
+  }
 
   async ngOnInit() {
     const resultado = await this.service.leerPlacasDesdeExcel();
 
     this.labelsPlacas = resultado.labels;
-    console.log("placas excel:"+this.labelsPlacas);
     this.datosPlacas = resultado.data;
 
-    // Inicializar primera página
     this.actualizarPagina();
 
-    console.log('Placas únicas:', this.labelsPlacas);
-    console.log('Cantidad por placa:', this.datosPlacas);
+    this.labelsEscolta = (await this.service.leerSumaColumna1PorEscolta()).labels;
+    this.datosConsignacion = (await this.service.leerSumaColumna1PorEscolta()).data;
+    this.totalConsignacion();
+ 
+    console.log("datos "+(await this.service.leerSumaColumna1PorEscolta()).data);
+    console.log("Titulo "+(await this.service.leerSumaColumna1PorEscolta()).labels); 
   }
+
+
+  totalConsignacionValue: String = '0';
+
+  private totalConsignacion(): void {
+    let total: number = 0;
+    for (let i = 0; i < this.datosConsignacion.length; i++) {
+      total += this.datosConsignacion[i];
+    }
+    this.totalConsignacionValue = formatValue(total);
+  }
+
 
   actualizarPagina() {
     const start = this.currentPage * this.pageSize;
@@ -68,25 +103,7 @@ export class Graphics implements OnInit {
       this.currentPage--;
       this.actualizarPagina();
     }
-  }
-
-  // 🔹 Lo demás que ya tenías
-  labels = ['Placa1', 'Placa2', 'Placa3', 'Placa4'];    
-  placaSeleccionada: string = '';
-
-  multiSeries = [
-    { data: [1, 2, 3, 4, 5], label: 'Empalmes' },
-    { data: [6, 7, 8, 9, 10], label: 'Puntos de venta' },
-    { data: [11, 12, 13, 14, 15], label: 'Acompañamientos' }
-  ];
-
-  labelGeneral = ['Soldado 1','Soldado 2','Soldado 3','Soldado 4','Soldado 5'];  
-  datosVentas = [30, 40, 30, 90, 64];
-  datosUsuarios = [50, 20, 30];  
-  datosConsignacion = [2500];
-  labelsConsignacion = ['Total consignación mensual'];
-
-  placaBusqueda: string = '';
+  }  
 
   get datosFiltrados() {
     if (!this.placaBusqueda) return this.datosPlacas;
@@ -109,4 +126,8 @@ export class Graphics implements OnInit {
     { lat: 6.244, lng: -75.581, label: 'Medellín' },
     { lat: 3.451, lng: -76.532, label: 'Cali' }
   ];
+
+
+  
+
 }

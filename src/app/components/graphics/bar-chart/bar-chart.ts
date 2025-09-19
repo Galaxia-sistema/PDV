@@ -4,6 +4,8 @@ import { ChartConfiguration, ChartType } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Chart, registerables } from 'chart.js';
+Chart.register(...registerables, ChartDataLabels);
 
 @Component({
   selector: 'app-bar-chart',
@@ -27,6 +29,9 @@ export class BarChartComponent implements OnChanges {
   @Input() placa: boolean = false; // control para mostrar input
   @Input() escolta: boolean = true; // control para mostrar input
   @Input() filter: string = '';    // valor sincronizado desde el padre (opcional)
+  @Input() showDecimals: boolean = false; // <- NUEVA VARIABLE DE CONTROL
+  @Input() formartterDiner: boolean = false; // <- NUEVA VARIABLE DE CONTROL
+
 
   // emisor para notificar al padre cuando el usuario escribe en el input del hijo
   @Output() filterChange = new EventEmitter<string>();
@@ -49,6 +54,7 @@ export class BarChartComponent implements OnChanges {
         position: 'top'
       },
       datalabels: {
+        formatter: (value: any) => this.formatValue(Number(value)), 
         offset: 4,
         anchor: 'end',
         align: 'end',
@@ -68,9 +74,13 @@ export class BarChartComponent implements OnChanges {
           
         }
       },
-      y: { ticks: { autoSkip: false } }
+      y: { ticks: { autoSkip: false ,                
+
+      } }
     }
-  };
+  }
+
+
 
   barChartData: ChartConfiguration['data'] = { labels: [], datasets: [] };
 
@@ -158,4 +168,22 @@ export class BarChartComponent implements OnChanges {
 
     setTimeout(() => this.chart?.update(), 0);
   }
+
+  private formatValue(value: number): string {
+    if (this.formartterDiner) {
+      // formato moneda (redondeado sin decimales)
+      return Number(value).toLocaleString('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
+    }
+
+    if (this.showDecimals) {
+      // con decimales (2 cifras)
+      return Number(value).toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // redondeado sin decimales
+    return Math.round(Number(value)).toLocaleString('es-CO');
+  }
+
 }
+
+
