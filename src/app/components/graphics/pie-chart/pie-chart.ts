@@ -59,9 +59,8 @@ export class PieChartComponent implements OnChanges, AfterViewInit {
         formatter: (value, ctx) => {
           const data = ctx.chart.data.datasets?.[0].data as number[] || [];
           const sum = data.reduce((a,b) => a + (Number(b) || 0), 0);
-          if (sum === 0) return '';
-          const percent = Math.round(((Number(value) || 0) / sum) * 100);
-          return `${value} (Soldado #)`;
+          if (sum === 0) return '';          
+          return `${value}` ;
         }
       }
     }

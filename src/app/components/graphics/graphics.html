@@ -19,7 +19,7 @@
                 [orientation]="'y'"
                 [data]="datosPlacasPaginados"
                 [labels]="labelsPlacasPaginadas"
-                title="Vehículos más escoltados"
+                
                 [placa]="true"
                 [escolta]="false">
             </app-bar-chart>
@@ -37,7 +37,6 @@
             [data]="datosConsignacion"
             [labels]="labelsEscolta"
             [value]="false"
-
             [formartterDiner]="true"
             title="Recolección de Consignaciones">
         </app-bar-chart>
@@ -49,11 +48,11 @@
         <p>{{totalConsignacionValue}}</p>
         <br>
         <h3>Total acompañamientos</h3>
-        <p>245</p>
+        <p>{{totalAcompValue}}</p>
         <h3>Total punto de venta</h3>
-        <p>245</p>
+        <p>{{totalSitiosValue}}</p>
         <h3>Total empalmes</h3>        
-        <p>245</p>
+        <p>{{totalEmpalmesValue}}</p>
     </div>    
   </div>
 </div>
@@ -68,6 +67,7 @@
     </app-bar-chart>
     <app-bar-chart      
         [labels]="labelsEscolta"
+        [data]="datosMarcaciones"
         title="Cantidad de acompañamientos por escolta"
         [escolta]="false"
         [value]="false">                   
@@ -76,7 +76,7 @@
 
 
 <div class="pie-grid">
-    <app-pie-chart [data]="datosVentas" [labels]="labelsEscolta" title="Cantidad de visitas a puntos de venta"></app-pie-chart>
-    <app-pie-chart [data]="datosVentas" [labels]="labelsEscolta" title="Cantidad de empalmes"></app-pie-chart>
-    <app-pie-chart [data]="datosUsuarios" [labels]="labelsEscolta" title="Cantidad de acompañamientos"></app-pie-chart>
+    <app-pie-chart [data]="datosSitio" [labels]="labelsEscolta" title="Cantidad de visitas a puntos de venta"></app-pie-chart>
+    <app-pie-chart [data]="datosEmpalmes" [labels]="labelsEscolta" title="Cantidad de empalmes"></app-pie-chart>
+    <app-pie-chart [data]="datosAcomp" [labels]="labelsEscolta" title="Cantidad de acompañamientos"></app-pie-chart>
 </div>

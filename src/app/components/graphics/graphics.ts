@@ -18,23 +18,13 @@ export class Graphics implements OnInit {
   constructor(private service: GraphicsService) {}
 
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
-
-  labels = ['Placa1', 'Placa2', 'Placa3', 'Placa4'];    
-  placaSeleccionada: string = '';
-
-  multiSeries = [
-    { data: [1, 2, 3, 4, 5], label: 'Empalmes' },
-    { data: [6, 7, 8, 9, 10], label: 'Puntos de venta' },
-    { data: [11, 12, 13, 14, 15], label: 'Acompañamientos' }
-  ];
-
-  datosVentas = [30, 40, 30, 90, 64];
-  datosUsuarios = [50, 20, 30];  
-  datosConsignacion = [2500];
+  
+  multiSeries: any[] = []; 
+  
+  placaBusqueda: string = '';
+  datosConsignacion = [0];
   labelsEscolta = [''];
 
-  placaBusqueda: string = '';
-  //-----------------------------------------
   labelsPlacas: string[] = [];
   datosPlacas: number[] = [];
 
@@ -43,6 +33,17 @@ export class Graphics implements OnInit {
 
   pageSize = 10;
   currentPage = 0;
+    
+  totalConsignacionValue: String = '0';
+  totalEmpalmesValue: String = '0';
+  totalAcompValue: String = '0';
+  totalSitiosValue: String = '0';
+
+  datosSitio = [0];
+  datosAcomp = [0];  
+  datosEmpalmes = [0];
+  datosMarcaciones = [0];
+  //-----------------------------------------
   @Input() fechaInicio: string = '';
   @Input() fechaFin: string = '';
 
@@ -53,29 +54,67 @@ export class Graphics implements OnInit {
 
   async ngOnInit() {
     const resultado = await this.service.leerPlacasDesdeExcel();
+    const resultadoEmpalmes = await this.service.obtenerTotalEmpalmePorEscolta();
+    const resultadoAcomp = await this.service.obtenerTotalAcompañamientoPorEscolta();
+    const resultadoSitios = await this.service.obtenerTotalSitioPorEscolta();
 
+    //REVISAR ESOS RESULTADOS
+    this.multiSeries = [
+      { data: resultadoEmpalmes.data, label: 'Empalmes' },
+      { data: resultadoSitios.data, label: 'Puntos de venta' },
+      { data: resultadoAcomp.data, label: 'Acompañamientos' }
+    ];
+
+    this.datosSitio = resultadoSitios.data;
+    this.datosAcomp = resultadoAcomp.data;
+    this.datosEmpalmes = resultadoEmpalmes.data;
     this.labelsPlacas = resultado.labels;
     this.datosPlacas = resultado.data;
+    this.datosMarcaciones = (await this.service.obtenerTotalMarcacionPorEscolta()).data;
 
     this.actualizarPagina();
+    this.labelsEscolta = (await this.service.obtenerTotalEmpalmePorEscolta()).labels;
 
-    this.labelsEscolta = (await this.service.leerSumaColumna1PorEscolta()).labels;
-    this.datosConsignacion = (await this.service.leerSumaColumna1PorEscolta()).data;
-    this.totalConsignacion();
- 
-    console.log("datos "+(await this.service.leerSumaColumna1PorEscolta()).data);
-    console.log("Titulo "+(await this.service.leerSumaColumna1PorEscolta()).labels); 
+    //muestra la acumulacion de todos los escoltas
+    this.totalConsignacion(); 
+    this.calcularTotalEmpalmes(resultadoEmpalmes);
+    this.calcularTotalAcompañamiento(resultadoAcomp);
+    this.calcularTotalSitios(resultadoSitios);
+  }
+
+  private async calcularTotalSitios(resultadoSitios: { data: number[] }): Promise<void> {
+    let total: number = 0;
+    for (let i = 0; i < resultadoSitios.data.length; i++) {
+      total += resultadoSitios.data[i];
+    }
+    this.totalSitiosValue = total.toString();    
   }
 
 
-  totalConsignacionValue: String = '0';
-
-  private totalConsignacion(): void {
+  private async calcularTotalEmpalmes(resultadoEmpalme: { data: number[] }): Promise<void> {
     let total: number = 0;
+    for (let i = 0; i < resultadoEmpalme.data.length; i++) {
+      total += resultadoEmpalme.data[i];
+    }
+    this.totalEmpalmesValue = total.toString();    
+  }
+
+  private async calcularTotalAcompañamiento(resultadoAcomp: { data: number[] }): Promise<void> {
+    let total: number = 0;
+    for (let i = 0; i < resultadoAcomp.data.length; i++) {
+      total += resultadoAcomp.data[i];
+    }
+    this.totalAcompValue = total.toString();
+  }
+
+  private async totalConsignacion(): Promise<void> {
+    let total: number = 0;
+    this.datosConsignacion = (await this.service.obtenerAcumulacionPorEscolta()).data;
     for (let i = 0; i < this.datosConsignacion.length; i++) {
       total += this.datosConsignacion[i];
     }
-    this.totalConsignacionValue = formatValue(total);
+    //Es el valor total que vemos en la tarjeta
+    this.totalConsignacionValue = formatValue(total); 
   }
 
 
@@ -119,15 +158,6 @@ export class Graphics implements OnInit {
       l.toLowerCase().includes(this.placaBusqueda.toLowerCase())
     );
     return match ? [match] : [];
-  }
-
-  markers = [
-    { lat: 4.711, lng: -74.072, label: 'Bogotá' },
-    { lat: 6.244, lng: -75.581, label: 'Medellín' },
-    { lat: 3.451, lng: -76.532, label: 'Cali' }
-  ];
-
-
-  
+  }  
 
 }
