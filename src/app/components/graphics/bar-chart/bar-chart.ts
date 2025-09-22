@@ -45,22 +45,34 @@ export class BarChartComponent implements OnChanges {
     responsive: true,
     maintainAspectRatio: false,
     indexAxis: 'x',
+    layout: {
+    padding: {
+      top: 0,
+      right: 30,
+      bottom: 20,
+      left: 20
+    }},
     plugins: {
-      legend: { 
-        display: true,
-        position: 'top'
-      },
-      datalabels: {
+      
+      title: {
+      display: !! this.title,
+      text: this.title,      
+      font: {
+        size: 14,
+        weight: 'bold'
+      }
+    },
+      datalabels: {        
         formatter: (value: any) => this.formatValue(Number(value)), 
         offset: 4,
-        anchor: 'end',
-        align: 'end',
-        color: '#000',
+        anchor: 'end',   // coloca la etiqueta al final
+        align: 'end',    // la sube para que no se esconda
+        color: '#050505ff',
         font: { 
           weight: 'bold',
           size: 12
-        }
-      }
+        }        
+      },        
     },
     scales: {
       x: { 
@@ -87,17 +99,13 @@ export class BarChartComponent implements OnChanges {
     // si el padre actualiza filter, sincronizamos el input local
     if (changes['filter'] && changes['filter'].currentValue !== undefined) {
       this.searchText = changes['filter'].currentValue ?? '';
-    }
-    // recomponer gráfico
+    }   
     this.updateChartData();
   }
 
-  // cuando el usuario escribe en el input del hijo...
   onSearchChange(): void {
-    // actualizamos el filter local y notificamos al padre
     this.filter = this.searchText;
     this.filterChange.emit(this.searchText);
-    // actualizamos inmediatamente para dar feedback instantáneo
     this.updateChartData();
   }
 
@@ -144,9 +152,8 @@ export class BarChartComponent implements OnChanges {
       });
     } else if (this.data && this.data.length) {
       const filtered = indices.map(i => this.data[i] ?? 0);
-      finalDatasets = [{ data: filtered, label: this.title || 'Datos'}];
-    } else {
-      // fallback según value
+      finalDatasets = [{ data: filtered, label: this.title }];
+    } else {      
       if (this.value) {
         finalDatasets = this.defaultDatasets3.map(ds => ({
           ...ds,
@@ -173,12 +180,6 @@ export class BarChartComponent implements OnChanges {
       // formato moneda (redondeado sin decimales)
       return Number(value).toLocaleString('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
     }
-
-    if (this.showDecimals) {
-      // con decimales (2 cifras)
-      return Number(value).toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-
     // redondeado sin decimales
     return Math.round(Number(value)).toLocaleString('es-CO');
   }

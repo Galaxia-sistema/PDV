@@ -17,7 +17,7 @@
                 [orientation]="'y'"
                 [data]="datosPlacasPaginados"
                 [labels]="labelsPlacasPaginadas"
-                
+                title="Coches mas escoltados"
                 [placa]="true"
                 [escolta]="false">
             </app-bar-chart>
@@ -35,7 +35,7 @@
             [labels]="labelsEscolta ?? []"
             [value]="false"
             [formartterDiner]="true"
-            title="Recolección de Consignaciones">
+            title="Consignación por escolta">
         </app-bar-chart>
         </div>
             
@@ -61,9 +61,10 @@
         [escolta]="false">
     </app-bar-chart>
     <app-bar-chart      
+    [orientation]="'y'"
         [labels]="labelsEscolta ?? []"
         [data]="datosMarcaciones"
-        title="Cantidad de acompañamientos por escolta"
+        title="Marcaciones por escolta"
         [escolta]="false"
         [value]="false">                   
     </app-bar-chart>

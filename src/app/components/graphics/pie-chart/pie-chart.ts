@@ -49,7 +49,7 @@ export class PieChartComponent implements OnChanges, AfterViewInit {
   pieChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     plugins: {
-      legend: { position: 'top' },
+     
       // Configuración específica para datalabels
       datalabels: {
         color: '#fff',
