@@ -1,5 +1,4 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BarChartComponent } from './bar-chart/bar-chart';
 import { PieChartComponent } from './pie-chart/pie-chart';
@@ -10,7 +9,7 @@ import { formatValue } from '../../helper/formatter-number'
 @Component({
   selector: 'app-graphics',
   standalone: true,
-  imports: [RouterOutlet, BarChartComponent, PieChartComponent, FormsModule],
+  imports: [BarChartComponent, PieChartComponent, FormsModule],
   templateUrl: './graphics.html',
   styleUrls: ['./graphics.css']
 })
@@ -23,9 +22,9 @@ export class Graphics implements OnInit {
   
   placaBusqueda: string = '';
   datosConsignacion = [0];
-  labelsEscolta = [''];
+  labelsEscolta? = [''];
 
-  labelsPlacas: string[] = [];
+  labelsPlacas?: string[] = [];
   datosPlacas: number[] = [];
 
   labelsPlacasPaginadas: string[] = [];
@@ -47,40 +46,47 @@ export class Graphics implements OnInit {
   @Input() fechaInicio: string = '';
   @Input() fechaFin: string = '';
 
-  private onSearchDataForDate(): void {
-    const fechaInicio = this.fechaInicio ? new Date(this.fechaInicio) : null;
-    const fechaFin = this.fechaFin ? new Date(this.fechaFin) : null;
-  }
 
   async ngOnInit() {
-    const resultado = await this.service.leerPlacasDesdeExcel();
-    const resultadoEmpalmes = await this.service.obtenerTotalEmpalmePorEscolta();
-    const resultadoAcomp = await this.service.obtenerTotalAcompañamientoPorEscolta();
-    const resultadoSitios = await this.service.obtenerTotalSitioPorEscolta();
-
-    //REVISAR ESOS RESULTADOS
-    this.multiSeries = [
-      { data: resultadoEmpalmes.data, label: 'Empalmes' },
-      { data: resultadoSitios.data, label: 'Puntos de venta' },
-      { data: resultadoAcomp.data, label: 'Acompañamientos' }
-    ];
-
-    this.datosSitio = resultadoSitios.data;
-    this.datosAcomp = resultadoAcomp.data;
-    this.datosEmpalmes = resultadoEmpalmes.data;
-    this.labelsPlacas = resultado.labels;
-    this.datosPlacas = resultado.data;
-    this.datosMarcaciones = (await this.service.obtenerTotalMarcacionPorEscolta()).data;
-
-    this.actualizarPagina();
-    this.labelsEscolta = (await this.service.obtenerTotalEmpalmePorEscolta()).labels;
-
-    //muestra la acumulacion de todos los escoltas
-    this.totalConsignacion(); 
-    this.calcularTotalEmpalmes(resultadoEmpalmes);
-    this.calcularTotalAcompañamiento(resultadoAcomp);
-    this.calcularTotalSitios(resultadoSitios);
+    await this.cargarDatos();
   }
+
+  async filtrarPorFechas() {
+    const inicio = this.fechaInicio ? new Date(this.fechaInicio) : null;
+    const fin = this.fechaFin ? new Date(this.fechaFin) : null;
+    await this.cargarDatos(inicio, fin);
+  }
+
+async cargarDatos(fechaInicio?: Date | null, fechaFin?: Date | null) {
+  const resultadoPlacas = await this.service.obtenerPlacasDesdeExcel(fechaInicio, fechaFin);
+  const resultadoEmpalmes = await this.service.obtenerTotalEmpalmePorEscolta(fechaInicio, fechaFin);
+  const resultadoAcomp = await this.service.obtenerTotalAcompañamientoPorEscolta(fechaInicio, fechaFin);
+  const resultadoSitios = await this.service.obtenerTotalSitioPorEscolta(fechaInicio, fechaFin);
+  const resultadoMarcaciones = await this.service.obtenerTotalMarcacionPorEscolta(fechaInicio, fechaFin);
+  const resultadoAcumulado = await this.service.obtenerAcumulacionPorEscolta(fechaInicio, fechaFin);
+
+  this.labelsPlacas = resultadoPlacas.labels;
+  this.datosPlacas = resultadoPlacas.data;
+  this.datosEmpalmes = resultadoEmpalmes.data;
+  this.datosAcomp = resultadoAcomp.data;
+  this.datosSitio = resultadoSitios.data;
+  this.datosMarcaciones = resultadoMarcaciones.data;
+  this.datosConsignacion = resultadoAcumulado.data;
+  this.labelsEscolta = resultadoEmpalmes.labels ?? [];
+
+  this.multiSeries = [
+    { data: resultadoEmpalmes.data, label: 'Empalmes' },
+    { data: resultadoSitios.data, label: 'Puntos de venta' },
+    { data: resultadoAcomp.data, label: 'Acompañamientos' }
+  ];
+
+  this.actualizarPagina();
+  this.calcularTotalEmpalmes(resultadoEmpalmes);
+  this.calcularTotalAcompañamiento(resultadoAcomp);
+  this.calcularTotalSitios(resultadoSitios);
+  this.totalConsignacion();
+}
+
 
   private async calcularTotalSitios(resultadoSitios: { data: number[] }): Promise<void> {
     let total: number = 0;
@@ -89,7 +95,6 @@ export class Graphics implements OnInit {
     }
     this.totalSitiosValue = total.toString();    
   }
-
 
   private async calcularTotalEmpalmes(resultadoEmpalme: { data: number[] }): Promise<void> {
     let total: number = 0;
@@ -108,26 +113,23 @@ export class Graphics implements OnInit {
   }
 
   private async totalConsignacion(): Promise<void> {
-    let total: number = 0;
-    this.datosConsignacion = (await this.service.obtenerAcumulacionPorEscolta()).data;
+    let total: number = 0;    
     for (let i = 0; i < this.datosConsignacion.length; i++) {
       total += this.datosConsignacion[i];
-    }
-    //Es el valor total que vemos en la tarjeta
+    }    
     this.totalConsignacionValue = formatValue(total); 
   }
 
-
   actualizarPagina() {
     const start = this.currentPage * this.pageSize;
-    this.labelsPlacasPaginadas = this.labelsPlacas.slice(start, start + this.pageSize);
+    this.labelsPlacasPaginadas = (this.labelsPlacas ?? []).slice(start, start + this.pageSize);
     this.datosPlacasPaginados = this.datosPlacas.slice(start, start + this.pageSize);
     
     this.chart?.update();
   }
 
   get totalPages() {
-    return Math.ceil(this.labelsPlacas.length / this.pageSize);
+    return Math.ceil((this.labelsPlacas?.length ?? 0) / this.pageSize);
   }
 
   nextPage() {
@@ -146,7 +148,7 @@ export class Graphics implements OnInit {
 
   get datosFiltrados() {
     if (!this.placaBusqueda) return this.datosPlacas;
-    const index = this.labelsPlacas.findIndex(l =>
+    const index = (this.labelsPlacas ?? []).findIndex(l =>
       l.toLowerCase().includes(this.placaBusqueda.toLowerCase())
     );
     return index >= 0 ? [this.datosPlacas[index]] : [];
@@ -154,7 +156,7 @@ export class Graphics implements OnInit {
 
   get labelsFiltrados() {
     if (!this.placaBusqueda) return this.labelsPlacas;
-    const match = this.labelsPlacas.find(l =>
+    const match = (this.labelsPlacas ?? []).find(l =>
       l.toLowerCase().includes(this.placaBusqueda.toLowerCase())
     );
     return match ? [match] : [];

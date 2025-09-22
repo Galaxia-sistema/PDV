@@ -3,16 +3,12 @@ import { Graphics } from './components/graphics/graphics';
 
 export const routes: Routes = [
   {
-    path: 'home',
+    path: 'dashboard',
     loadComponent: () => import('./components/graphics/graphics').then(m => m.Graphics)
-  },
-  {
-    path: 'about',
-    loadComponent: () => import('./components/graphics/graphics').then(m => m.Graphics)
-  },
+  },  
   {
     path: '',
-    redirectTo: '/home',
+    redirectTo: '/dashboard',
     pathMatch: 'full'
   }
 ];
