@@ -38,6 +38,7 @@
     "ng2-charts": "^8.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
+    "xlsx": "^0.18.5",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
@@ -47,6 +48,7 @@
     "@types/jasmine": "~5.1.0",
     "@types/leaflet": "^1.9.20",
     "@types/maplibre-gl": "^1.13.2",
+    "@types/xlsx": "^0.0.35",
     "jasmine-core": "~5.9.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
