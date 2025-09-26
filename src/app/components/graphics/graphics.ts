@@ -39,7 +39,7 @@ export class Graphics implements OnInit {
   totalSitiosValue: String = '0';
 
   datosSitio = [0];
-  datosAcomp = [0];  
+  datosAcomp = [0,0,0,0,0];  
   datosEmpalmes = [0];
   datosMarcaciones = [0];
   //-----------------------------------------

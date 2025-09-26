@@ -112,12 +112,12 @@ export class BarChartComponent implements OnChanges {
  // fallback data
   private defaultLabels = ['Soldado 1', 'Soldado 2', 'Soldado 3', 'Soldado 4', 'Soldado 5'];
   private defaultDatasets3: ChartConfiguration['data']['datasets'] = [
-    { data: [65, 59, 80, 81, 56], label: 'Empalmes' },
-    { data: [28, 48, 40, 19, 86], label: 'Puntos de venta' },
-    { data: [2, 48, 40, 19, 86], label: 'Acompañamientos' }
+    { data: [0, 0, 0, 0, 0], label: 'Empalmes' },
+    { data: [0, 0, 0, 0, 0], label: 'Puntos de venta' },
+    { data: [0, 0, 0, 0, 0], label: 'Acompañamientos' }
   ];
   private defaultDataset1: ChartConfiguration['data']['datasets'] = [
-    { data: [28, 48, 40, 19, 86], label: 'Consignación' }
+    { data: [0, 0, 0, 0, 0], label: 'Consignación' }
   ];
 
   private updateChartData(): void {

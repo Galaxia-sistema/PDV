@@ -9,7 +9,8 @@ export class GraphicsService {
 
  private async contarPorColumna(archivo: string,columna: number, devolverLabels: boolean = true, ordenar: boolean = true,
   fechaColumna?: number, fechaInicio?: string | Date | null, fechaFin?: string | Date | null, acumularNumerico: boolean = false): Promise<{ labels?: string[], data: number[] }> {
-  const response = await fetch(`assets/${archivo}.xlsx`);
+
+  const response = await fetch(`http://localhost:8000/api/excels/${archivo}.xlsx`);
   const arrayBuffer = await response.arrayBuffer();
   const data = new Uint8Array(arrayBuffer);
 
@@ -78,11 +79,12 @@ export class GraphicsService {
   }
 
   async obtenerTotalMarcacionPorEscolta(fechaInicio?: string | Date | null, fechaFin?: string | Date | null) {
-    return this.contarPorColumna('marcacion', 0, false, true, 3, fechaInicio, fechaFin);
+    return this.contarPorColumna('Marcaciones', 0, false, true, 3, fechaInicio, fechaFin);
   }
 
   async obtenerAcumulacionPorEscolta(fechaInicio?: string | Date | null, fechaFin?: string | Date | null) {
-    return this.contarPorColumna('Acompañamiento', 1, true, false, 3, fechaInicio, fechaFin, true);
+    return this.contarPorColumna('Acompañamiento', 7, true, false, 3, fechaInicio, fechaFin, true);
   }
 
 }
+
