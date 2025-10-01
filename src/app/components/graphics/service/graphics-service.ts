@@ -26,10 +26,9 @@ export class GraphicsService {
   const acumulado = new Map<string, number>();
 
   for (const row of dataRows) {
-    const clave = row[columna];
+    const clave = row[columna];    
     if (!clave) continue;
-
-    // ⬇️ Filtro por fecha si se pasa columna de fechas
+    
     if (fechaColumna !== undefined && (inicio || fin)) {
       const fechaObj = parseExcelDate(row[fechaColumna]);
       if (!fechaObj) continue;
@@ -38,7 +37,7 @@ export class GraphicsService {
     }
 
     if (acumularNumerico) {
-      const valor = parseNumber(row[0]); // suponiendo que el valor está en col 0
+      const valor = parseNumber(row[columna]);
       if (isNaN(valor)) continue;
       acumulado.set(clave, (acumulado.get(clave) || 0) + valor);
     } else {
@@ -81,8 +80,10 @@ export class GraphicsService {
     return this.contarPorColumna('marcacion', 0, false, true, 3, fechaInicio, fechaFin);
   }
 
+
   async obtenerAcumulacionPorEscolta(fechaInicio?: string | Date | null, fechaFin?: string | Date | null) {
-    return this.contarPorColumna('Acompañamiento', 1, true, false, 3, fechaInicio, fechaFin, true);
+    return this.contarPorColumna('Acompañamiento', 7, true, false, 3, fechaInicio, fechaFin, true);
   }
+
 
 }
