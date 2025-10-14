@@ -34,7 +34,6 @@
     "chartjs-plugin-annotation": "^3.1.0",
     "chartjs-plugin-datalabels": "^2.2.0",
     "leaflet": "^1.9.4",
-    "maplibre-gl": "^5.7.1",
     "ng2-charts": "^8.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

@@ -9,7 +9,6 @@
   <button class="btn-filtrar" (click)="filtrarPorFechas()">buscar</button>
 </div>
 
-
 <div class="section" style="align-items: center;">
   <div class="charts-container">        
         <div class="chart-column" style="height: 500px;position: relative;">
@@ -17,7 +16,7 @@
                 [orientation]="'y'"
                 [data]="datosPlacasPaginados"
                 [labels]="labelsPlacasPaginadas"
-                title="Coches mas escoltados"
+                title="Vehículos más escoltados"
                 [placa]="true"
                 [escolta]="false">
             </app-bar-chart>

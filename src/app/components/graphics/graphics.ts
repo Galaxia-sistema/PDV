@@ -64,7 +64,7 @@ async cargarDatos(fechaInicio?: Date | null, fechaFin?: Date | null) {
   const resultadoSitios = await this.service.obtenerTotalSitioPorEscolta(fechaInicio, fechaFin);
   const resultadoMarcaciones = await this.service.obtenerTotalMarcacionPorEscolta(fechaInicio, fechaFin);
   const resultadoAcumulado = await this.service.obtenerAcumulacionPorEscolta(fechaInicio, fechaFin);
-
+console.log('Resultado Acumulado:', resultadoAcumulado);
   this.labelsPlacas = resultadoPlacas.labels;
   this.datosPlacas = resultadoPlacas.data;
   this.datosEmpalmes = resultadoEmpalmes.data;
@@ -73,7 +73,7 @@ async cargarDatos(fechaInicio?: Date | null, fechaFin?: Date | null) {
   this.datosMarcaciones = resultadoMarcaciones.data;
   this.datosConsignacion = resultadoAcumulado.data;
   this.labelsEscolta = resultadoEmpalmes.labels ?? [];
-
+console.log('Labels Escolta:', this.labelsEscolta);
   this.multiSeries = [
     { data: resultadoEmpalmes.data, label: 'Empalmes' },
     { data: resultadoSitios.data, label: 'Puntos de venta' },
@@ -83,6 +83,7 @@ async cargarDatos(fechaInicio?: Date | null, fechaFin?: Date | null) {
   this.actualizarPagina();
   this.calcularTotalEmpalmes(resultadoEmpalmes);
   this.calcularTotalAcompañamiento(resultadoAcomp);
+  
   this.calcularTotalSitios(resultadoSitios);
   this.totalConsignacion();
 }
