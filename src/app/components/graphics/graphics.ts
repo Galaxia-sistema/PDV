@@ -19,10 +19,12 @@ export class Graphics implements OnInit {
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
   
   multiSeries: any[] = []; 
-  
+  datosConsignacionMultiple: any[] = []; 
+
   placaBusqueda: string = '';
   datosConsignacion = [0];
   labelsEscolta? = [''];
+  labelFlota? = [''];
 
   labelsPlacas?: string[] = [];
   datosPlacas: number[] = [];
@@ -40,6 +42,7 @@ export class Graphics implements OnInit {
 
   datosSitio = [0];
   datosAcomp = [0];  
+  datosFlotaAcomp: number[] = [];
   datosEmpalmes = [0];
   datosMarcaciones = [0];
   //-----------------------------------------
@@ -64,19 +67,32 @@ async cargarDatos(fechaInicio?: Date | null, fechaFin?: Date | null) {
   const resultadoSitios = await this.service.obtenerTotalSitioPorEscolta(fechaInicio, fechaFin);
   const resultadoMarcaciones = await this.service.obtenerTotalMarcacionPorEscolta(fechaInicio, fechaFin);
   const resultadoAcumulado = await this.service.obtenerAcumulacionPorEscolta(fechaInicio, fechaFin);
-console.log('Resultado Acumulado:', resultadoAcumulado);
+  const resultadoFlota = await this.service.obtenerAcumulacionPorFlota(fechaInicio, fechaFin);
+  console.log("RESULTADO FLOTA: ",resultadoFlota);
+  const totalEnSitioPorEscolta = await this.service.obtenerAcumulacionPorTipo(fechaInicio, fechaFin);
+  
+
   this.labelsPlacas = resultadoPlacas.labels;
-  this.datosPlacas = resultadoPlacas.data;
-  this.datosEmpalmes = resultadoEmpalmes.data;
+  this.labelFlota = resultadoFlota.labels;
+  this.labelsEscolta = resultadoEmpalmes.labels ?? [];  
+  this.datosFlotaAcomp = resultadoFlota.data;
+  console.log("FLOTA",this.datosFlotaAcomp);
+  
   this.datosAcomp = resultadoAcomp.data;
   this.datosSitio = resultadoSitios.data;
-  this.datosMarcaciones = resultadoMarcaciones.data;
+  this.datosPlacas = resultadoPlacas.data;
   this.datosConsignacion = resultadoAcumulado.data;
-  this.labelsEscolta = resultadoEmpalmes.labels ?? [];
-console.log('Labels Escolta:', this.labelsEscolta);
+  this.datosMarcaciones = resultadoMarcaciones.data;
+  this.datosEmpalmes = resultadoEmpalmes.data.length > 0 ? resultadoEmpalmes.data : [0];
+
+
+  this.datosConsignacionMultiple = [
+    { data: totalEnSitioPorEscolta['enVehiculo'], label: 'En vehículo' },
+    { data: totalEnSitioPorEscolta['enSitio'], label: 'PDV' }
+  ];
   this.multiSeries = [
     { data: resultadoEmpalmes.data, label: 'Empalmes' },
-    { data: resultadoSitios.data, label: 'Puntos de venta' },
+    { data: resultadoSitios.data, label: 'PDV' },
     { data: resultadoAcomp.data, label: 'Acompañamientos' }
   ];
 

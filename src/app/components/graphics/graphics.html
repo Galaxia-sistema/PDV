@@ -10,33 +10,29 @@
 </div>
 
 <div class="section" style="align-items: center;">
-  <div class="charts-container">        
-        <div class="chart-column" style="height: 500px;position: relative;">
-            <app-bar-chart
-                [orientation]="'y'"
-                [data]="datosPlacasPaginados"
-                [labels]="labelsPlacasPaginadas"
-                title="Vehículos más escoltados"
-                [placa]="true"
-                [escolta]="false">
-            </app-bar-chart>
 
-            <div class="pagination" style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);">
-                <button (click)="prevPage()" [disabled]="currentPage === 0">Anterior</button>
-                <span>Página {{ currentPage + 1 }} de {{ totalPages }}</span>
-                <button (click)="nextPage()" [disabled]="currentPage >= totalPages - 1">Siguiente</button>
-            </div>
+    
+    <div class="charts-container"> 
+        
+        <div class="chart-column" style="height: 500px;position: relative;">
+            <app-bar-chart 
+                [datasets]="datosConsignacionMultiple"
+                [labels]="labelsEscolta ?? []"
+                title="Estadísticas por tipo de acompañamiento"
+                >
+            </app-bar-chart>          
         </div>
         
         <div class="chart-column">
-        <app-bar-chart
-            [data]="datosConsignacion"
-            [labels]="labelsEscolta ?? []"
-            [value]="false"
-            [formartterDiner]="true"
-            title="Consignación por escolta">
-        </app-bar-chart>
+            <app-bar-chart
+                [data]="datosConsignacion"
+                [labels]="labelsEscolta ?? []"
+                [value]="false"
+                [formartterDiner]="true"
+                title="Consignación total por escolta">
+            </app-bar-chart>        
         </div>
+        
             
     <div class="totalConsignacion"> 
         <h3>Total Consignacion </h3> 
@@ -53,6 +49,8 @@
 </div>
 
 <div class="section-bar" >
+ 
+    
     <app-bar-chart 
         [datasets]="multiSeries"
         [labels]="labelsEscolta ?? []"
@@ -73,4 +71,39 @@
     <app-pie-chart [data]="datosSitio" [labels]="labelsEscolta ?? []" title="Cantidad de visitas a puntos de venta"></app-pie-chart>
     <app-pie-chart [data]="datosEmpalmes" [labels]="labelsEscolta ?? []" title="Cantidad de empalmes"></app-pie-chart>
     <app-pie-chart [data]="datosAcomp" [labels]="labelsEscolta ?? []" title="Cantidad de acompañamientos"></app-pie-chart>
+</div>
+
+<div style="margin-top: 30px;display:flex;justify-content: space-evenly;">
+    <div class="chart-column" style="height: 480px;position: relative;">
+        <app-bar-chart
+            [orientation]="'y'"
+            [data]="datosPlacasPaginados"
+            [labels]="labelsPlacasPaginadas"
+            title="Vehículos más escoltados"
+            [placa]="true"
+            [escolta]="false">
+        </app-bar-chart>
+
+        <div class="pagination" style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);">
+            <button (click)="prevPage()" [disabled]="currentPage === 0">Anterior</button>
+            <span>Página {{ currentPage + 1 }} de {{ totalPages }}</span>
+            <button (click)="nextPage()" [disabled]="currentPage >= totalPages - 1">Siguiente</button>
+        </div>
+    </div>
+
+
+    <div class="chart-column" style="height: 500px;position: relative;">
+        <br>
+        <br>
+        <br>
+        <br>
+        <app-bar-chart 
+            [data]="datosFlotaAcomp"
+            [labels]="labelFlota ?? []"
+            [escolta]="false"
+            title="Flota"
+            [value]="false">
+        </app-bar-chart>          
+    </div>
+    
 </div>

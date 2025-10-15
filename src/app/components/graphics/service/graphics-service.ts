@@ -9,9 +9,9 @@ export class GraphicsService {
 
  private async contarPorColumna(
   archivo: string,
-  columnaClave: number,               // columna del escolta
-  columnaValor?: number,              // columna del valor numérico (solo si modo = 'sumar')
-  modo: 'contar' | 'sumar' = 'contar', // nuevo parámetro
+  columnaClave: number,
+  columnaValor?: number,              
+  modo: 'contar' | 'sumar' = 'contar', 
   devolverLabels: boolean = true,
   ordenarAlfabeticamente: boolean = true,
   fechaColumna?: number,
@@ -90,11 +90,94 @@ export class GraphicsService {
     return this.contarPorColumna('marcacion', 0, undefined, "contar", false, true, 2, fechaInicio, fechaFin);
   }
 
-
-  async obtenerAcumulacionPorEscolta(fechaInicio?: string | Date | null, fechaFin?: string | Date | null) {
-    //error cuando le digo que sea true, y ese true es para ordenar
+  async obtenerAcumulacionPorEscolta(fechaInicio?: string | Date | null, fechaFin?: string | Date | null) {    
     return this.contarPorColumna('Acompañamiento', 1, 7, "sumar", true, true, 3, fechaInicio, fechaFin);
   }
 
+  async obtenerAcumulacionPorFlota(fechaInicio?: string | Date | null, fechaFin?: string | Date | null) {    
+    return this.contarPorColumna('Acompañamiento', 10, 7, "sumar", true, true, 3, fechaInicio, fechaFin);
+  }
+
+  async totalEnVehiculoPorEscolta(fechaInicio?: string | Date | null, fechaFin?: string | Date | null) {    
+    return this.totalEnVehiculo('Acompañamiento', 1, 7, "sumar", true, true, 3, fechaInicio, fechaFin);
+  }
+
+
+async obtenerAcumulacionPorTipo(fechaInicio?: string | Date | null, fechaFin?: string | Date | null) {    
+  return this.totalEnVehiculo('Acompañamiento', 1, 7, "sumar", true, true, 3, fechaInicio, fechaFin,6);
+}
+
+
+ private async totalEnVehiculo(
+  archivo: string,
+  columnaClave: number,
+  columnaValor: number,
+  modo = 'sumar',
+  devolverLabels: boolean = true,
+  ordenarAlfabeticamente: boolean = true,
+  fechaColumna?: number,
+  fechaInicio?: string | Date | null,
+  fechaFin?: string | Date | null,
+  columnaTipo: number = 6 
+): Promise<{
+  labels?: string[],
+  enSitio?: number[],
+  enVehiculo?: number[]
+}> {
+  const response = await fetch(`assets/${archivo}.xlsx`);
+  const arrayBuffer = await response.arrayBuffer();
+  const data = new Uint8Array(arrayBuffer);
+
+  const wb: XLSX.WorkBook = XLSX.read(data, { type: 'array' });
+  const wsname: string = wb.SheetNames[0];
+  const ws: XLSX.WorkSheet = wb.Sheets[wsname];
+  const rows = XLSX.utils.sheet_to_json(ws, { header: 1 }) as any[][];
+
+  const dataRows = rows.slice(1);
+  const inicio = fechaInicio ? new Date(fechaInicio) : null;
+  const fin = fechaFin ? new Date(fechaFin) : null;
+  
+  const acumulado = new Map<string, { enSitio: number; enVehiculo: number }>();
+
+  for (const row of dataRows) {
+    const claveRaw = row[columnaClave];
+    const tipoOperacion = String(row[columnaTipo] || '').toLowerCase().trim(); // “en sitio” o “en vehículo”
+
+    if (!claveRaw || !tipoOperacion) continue;
+    const clave = String(claveRaw).trim();
+
+    // Filtrado por fecha
+    if (fechaColumna !== undefined && (inicio || fin)) {
+      const fechaObj = parseExcelDate(row[fechaColumna]);
+      if (!fechaObj) continue;
+      if (inicio && fechaObj < inicio) continue;
+      if (fin && fechaObj > fin) continue;
+    }
+
+    const valor = Number(row[columnaValor]);
+    if (isNaN(valor)) continue;
+
+    if (!acumulado.has(clave)) {
+      acumulado.set(clave, { enSitio: 0, enVehiculo: 0 });
+    }
+
+    const registro = acumulado.get(clave)!;
+    if (tipoOperacion.includes('punto venta')) {
+      registro.enSitio += valor;
+    } else if (tipoOperacion.includes('vehiculo')) {
+      registro.enVehiculo += valor;
+    }
+  }
+
+  const ordenado = Array.from(acumulado.entries()).sort((a, b) =>
+    ordenarAlfabeticamente ? a[0].localeCompare(b[0]) : (b[1].enSitio + b[1].enVehiculo) - (a[1].enSitio + a[1].enVehiculo)
+  );
+
+  const labels = ordenado.map(([clave]) => clave);
+  const enSitio = ordenado.map(([_, valores]) => valores.enSitio);
+  const enVehiculo = ordenado.map(([_, valores]) => valores.enVehiculo);
+
+  return devolverLabels ? { labels, enSitio, enVehiculo } : { enSitio, enVehiculo };
+}
 
 }

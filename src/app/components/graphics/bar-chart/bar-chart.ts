@@ -48,7 +48,7 @@ export class BarChartComponent implements OnChanges {
     layout: {
     padding: {
       top: 0,
-      right: 30,
+      right: 50,
       bottom: 20,
       left: 20
     }},
@@ -108,26 +108,20 @@ export class BarChartComponent implements OnChanges {
     this.filterChange.emit(this.searchText);
     this.updateChartData();
   }
-
- // fallback data
+ 
   private defaultLabels = ['Soldado 1', 'Soldado 2', 'Soldado 3', 'Soldado 4', 'Soldado 5'];
   private defaultDatasets3: ChartConfiguration['data']['datasets'] = [
-    { data: [65, 59, 80, 81, 56], label: 'Empalmes' },
-    { data: [28, 48, 40, 19, 86], label: 'Puntos de venta' },
-    { data: [2, 48, 40, 19, 86], label: 'Acompañamientos' }
+    { data: [0], label: 'Empalmes' },
+    { data: [0], label: 'Puntos de venta' },
+    { data: [0], label: 'Acompañamientos' }
   ];
   private defaultDataset1: ChartConfiguration['data']['datasets'] = [
-    { data: [28, 48, 40, 19, 86], label: 'Consignación' }
+    { data: [0], label: 'Consignación' }
   ];
 
-  private updateChartData(): void {
-    // aplicar orientación
-    this.barChartOptions = { ...this.barChartOptions, indexAxis: this.orientation };
-
-    // labels base (si no vienen, usar fallback)
-    const baseLabels = (this.labels && this.labels.length) ? this.labels : this.defaultLabels;
-
-    // calcular índices que coinciden con el filtro actual (filter)
+  private updateChartData(): void {    
+    this.barChartOptions = { ...this.barChartOptions, indexAxis: this.orientation };    
+    const baseLabels = (this.labels && this.labels.length) ? this.labels : this.defaultLabels;    
     const search = (this.filter ?? '').toString().trim().toLowerCase();
     let indices: number[] = [];
     if (search) {
@@ -138,8 +132,7 @@ export class BarChartComponent implements OnChanges {
     } else {
       indices = baseLabels.map((_, i) => i);
     }
-
-    // crear labels filtradas
+    
     const labelsFiltered = indices.map(i => baseLabels[i]);
 
     let finalDatasets: ChartConfiguration['data']['datasets'] = [];
@@ -176,11 +169,9 @@ export class BarChartComponent implements OnChanges {
   }
 
   private formatValue(value: number): string {
-    if (this.formartterDiner) {
-      // formato moneda (redondeado sin decimales)
+    if (this.formartterDiner) {     
       return Number(value).toLocaleString('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
     }
-    // redondeado sin decimales
     return Math.round(Number(value)).toLocaleString('es-CO');
   }
 
