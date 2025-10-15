@@ -18,3 +18,28 @@
     font-size: 24px;
     font-weight: bold;
 }
+
+button{
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #54a3db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+
+}
+
+button:hover {
+
+    background-color: #93caf0;
+    
+}
+
+.header-buttons{
+    position: absolute;
+    background-color:yellow;
+    right: 130px;
+    display: flex;
+}

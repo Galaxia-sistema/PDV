@@ -5,4 +5,14 @@
     <div class="header-title">
         <h1>Visita seguridad PDV</h1>
     </div>
+
+    <div class="header-buttons">
+      <button *ngIf="urlActual === '/dashboard'; else irMapa" (click)="irAlMapa()">
+        Ir al mapa
+      </button>
+
+      <ng-template #irMapa>
+        <button (click)="irAlDashBoard()">Ir al dashboard</button>
+      </ng-template>
+    </div>
 </div>
